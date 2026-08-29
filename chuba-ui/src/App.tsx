@@ -10,17 +10,20 @@ function App() {
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
   const [requirements, setRequirements] = useState<string[]>([]);
+  const [zkProof, setZkProof] = useState('');
 
   const handleCheck = async () => {
     if (!departure || !destination) {
       setResult('Please select both countries.');
       setRequirements([]);
+      setZkProof('');
       return;
     }
 
     setLoading(true);
     setResult('');
     setRequirements([]);
+    setZkProof('');
 
     try {
       const response = await fetch('http://localhost:3000/api/travel-rules', {
@@ -40,13 +43,16 @@ function App() {
       if (data.error) {
         setResult('Error: ' + data.error);
         setRequirements([]);
+        setZkProof('');
       } else {
         setResult('OK: ' + data.message);
         setRequirements(data.requirements || ['Valid passport required']);
+        setZkProof(data.zkProof || 'ZK proof verified');
       }
     } catch (error) {
       setResult('MOCK: ' + departure + ' to ' + destination + ' (backend not running)');
       setRequirements([]);
+      setZkProof('');
     } finally {
       setLoading(false);
     }
@@ -55,7 +61,10 @@ function App() {
   return (
     <div className="app-container">
       <div className="app-card">
-        <h1 className="app-title">Chuba</h1>
+        <div className="header-badge">
+          <h1 className="app-title">Chuba</h1>
+          <span className="zk-badge">ZK-Protected</span>
+        </div>
         <p className="app-subtitle">Privacy-preserving travel eligibility</p>
 
         <div className="profile-card">
@@ -66,7 +75,7 @@ function App() {
               <div className="profile-detail">Elite Hacker (Brazil to UK)</div>
             </div>
           </div>
-          <div className="profile-badge">ZK-Protected</div>
+          <div className="profile-badge">Compact Verified</div>
         </div>
 
         <label className="form-label">Departure Country</label>
@@ -142,7 +151,12 @@ function App() {
 
         {result && (
           <div className={'result-box' + (result.includes('MOCK') ? ' mock' : '')}>
-            {result}
+            <div className="result-main">{result}</div>
+            {zkProof && (
+              <div className="zk-proof-badge">
+                [ZK] {zkProof}
+              </div>
+            )}
           </div>
         )}
 
