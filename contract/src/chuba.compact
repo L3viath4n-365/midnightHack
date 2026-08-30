@@ -14,12 +14,9 @@ export enum State {
 
 // Private state for the contract
 export type ChubaPrivateState = {
-  departure: string;
-  destination: string;
-  equipmentValue: integer;
-  healthStatus: string;
-  securityClearance: string;
-  eligible: boolean;
+  dob: string;
+  passportExpiration: string;
+  nationality: string;
 };
 
 // Contract definition
