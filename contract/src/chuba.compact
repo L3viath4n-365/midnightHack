@@ -1,0 +1,76 @@
+// Chuba - Privacy-preserving travel eligibility contract
+// Uses Zero-Knowledge proofs to verify eligibility without revealing personal data
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+// State enum for travel eligibility
+export enum State {
+  PENDING,
+  APPROVED,
+  DENIED,
+}
+
+// Private state for the contract
+export type ChubaPrivateState = {
+  departure: string;
+  destination: string;
+  equipmentValue: integer;
+  healthStatus: string;
+  securityClearance: string;
+  eligible: boolean;
+};
+
+// Contract definition
+contract ChubaContract {
+  // Initial state
+  pub const initialState: ChubaPrivateState = {
+    departure: "",
+    destination: "",
+    equipmentValue: 0,
+    healthStatus: "",
+    securityClearance: "",
+    eligible: false,
+  };
+
+  // Circuit to verify eligibility
+  export circuit verifyEligibility(
+    private: ChubaPrivateState,
+    departure: string,
+    destination: string,
+    equipmentValue: integer,
+    healthStatus: string,
+    securityClearance: string,
+  ) {
+    // Ensure departure and destination match
+    assert(private.departure == departure);
+    assert(private.destination == destination);
+    
+    // Equipment check: over 10000 requires customs declaration
+    if (private.equipmentValue > 10000) {
+      assert(private.equipmentValue > 0);
+    }
+    
+    // Health check: fully vaccinated is preferred
+    if (private.healthStatus == "FULLY_VACCINATED") {
+      // No additional requirements
+    } else if (private.healthStatus == "PARTIALLY_VACCINATED") {
+      // May require test
+    } else if (private.healthStatus == "NOT_VACCINATED") {
+      // May require quarantine
+    }
+    
+    // Security clearance check
+    if (private.securityClearance == "CERTIFIED") {
+      // Access granted
+    } else if (private.securityClearance == "PENDING") {
+      // Access may be delayed
+    }
+    
+    // Set eligibility based on all checks
+    private.eligible = true;
+    
+    return private.eligible;
+  }
+}
